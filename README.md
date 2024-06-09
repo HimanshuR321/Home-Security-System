@@ -4,8 +4,8 @@
 This repository contains the Arduino code for the Home Security System, including integration with a GSM module for status reporting via SMS.
 
 ## Contents
-- **Arduino_Code/**: Contains the Arduino firmware for the Home Security System.
-- **Documentation/**: Contains any documentation or manuals related to the project.
+- **Arduino_Code**: Contains the Arduino firmware for the Home Security System.
+- **Documentation_pdf**: Contains any documentation or manuals related to the project.
 - **README.md**: Provides an overview of the project and its contents.
 - **LICENSE**: Contains the license information for the project.
 
