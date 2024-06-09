@@ -1,0 +1,72 @@
+#include <SoftwareSerial.h>
+SoftwareSerial gsmSerial(7, 8); // RX, TX (for GSM module)
+const int pirPin = 2; // PIR sensor connected to digital pin 2
+const int ultrasonicTrigPin = 5; // Ultrasonic sensor trigger pin (connected
+to Arduino pin 7)
+const int ultrasonicEchoPin = 6; // Ultrasonic sensor echo pin (connected to
+Arduino pin 8)
+const int relayPin = 12; // Relay control pin (connected to digital pin
+12)
+const int buzzerPin = 11; // Buzzer control pin (connected to digital
+pin 11)
+long duration;
+int distance;
+void setup() {
+pinMode(pirPin, INPUT);
+pinMode(relayPin, OUTPUT);
+pinMode(buzzerPin, OUTPUT);
+pinMode(ultrasonicTrigPin, OUTPUT);
+pinMode(ultrasonicEchoPin, INPUT);
+Serial.begin(9600);
+gsmSerial.begin(9600); // Initialize software serial for GSM module
+
+//gsmSerial.println("AT+CMGF=1");
+//delay(1000);
+}
+void loop() {
+// PIR Sensor Detection
+int pirValue = digitalRead(pirPin);
+// Ultrasonic Sensor Detection
+digitalWrite(ultrasonicTrigPin, LOW);
+delayMicroseconds(2);
+digitalWrite(ultrasonicTrigPin, HIGH);
+delayMicroseconds(10);
+digitalWrite(ultrasonicTrigPin, LOW);
+duration = pulseIn(ultrasonicEchoPin, HIGH);
+distance = (duration / 2) / 29.1; // Calculate distance in centimeters
+
+if (pirValue == HIGH || distance < 10) {
+Serial.println("Sending SMS...");
+delay(1000);
+gsmSerial.println("AT+CMGF=1");
+delay(1000);
+// Replace with the recipient's phone number
+String phoneNumber = "+918328963290";
+// Replace with the SMS message you want to send
+String message = "intrusion detected.";
+// Send the SMS
+sendSMS(phoneNumber, message);
+digitalWrite(relayPin, LOW);
+digitalWrite(buzzerPin, HIGH);
+tone(buzzerPin, 1000, 5000);
+delay(5000); // Buzzer sounds for 1 second
+// Pause for 1 second
+// Replace with the recipient's phone number
+
+// Send the SMS
+digitalWrite(buzzerPin, LOW);
+delay(100);
+} else {
+digitalWrite(relayPin, HIGH);
+}
+delay(100); // Adjust the delay to control the sensor polling rate
+}
+void sendSMS(String phoneNumber, String message) {
+gsmSerial.print("AT+CMGS=\"");
+gsmSerial.print(phoneNumber);
+gsmSerial.println("\"");
+delay(100);
+gsmSerial.print(message);
+gsmSerial.write(26); // End the SMS by sending Ctrl+Z character
+delay(100);
+}
